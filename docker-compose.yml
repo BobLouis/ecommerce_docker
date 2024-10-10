@@ -2,13 +2,27 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "220.132.122.222:3000:3000"  # Bind to the specific IP and port
     environment:
       - NODE_ENV=production
     networks:
       - app-network
     depends_on:
       - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "220.132.122.222:8080:8080"  # Bind to the specific IP and port
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://nodeuser:123456@db:5432/nodedb
+    networks:
+      - app-network
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      - db
 
   db:
     image: postgres:12
@@ -21,23 +35,10 @@ services:
     networks:
       - app-network
 
-  backend:
-    build: ./backend
-    ports:
-      - "8080:8080"
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgres://nodeuser:123456@db:5432/nodedb
-    networks:
-      - app-network
-    depends_on:
-      - db
-
-  
-
 networks:
   app-network:
     driver: bridge
 
 volumes:
   postgres_data:
+  backend_uploads:
